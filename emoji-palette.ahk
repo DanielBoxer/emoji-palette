@@ -1,7 +1,4 @@
-﻿global GUI_Open := 0
-global GUI_Handle
-
-arms_left := ["╰", "ヽ", "\", "੧", "⋋", "ლ", "ლ", "ᕙ", "୧", "┌"
+﻿arms_left := ["╰", "ヽ", "\", "੧", "⋋", "ლ", "ლ", "ᕙ", "୧", "┌"
     , "└", "٩", "ᕦ", "へ", "¯\_", "╚", "═", "c", "乁", "o͡͡͡╮"]
 arms_right := ["╯", "ﾉ", "ノ", "/", "੭", "⋌", "⊃", "つ", "ᕗ", "୨", "┐", "┘", "و"
     , "ง", "ᕤ", "ᓄ", "_/¯", "═╝", "ㄏ", "ᕤ", "╭", "o͡͡͡", "ノ", "⌒", "."]
@@ -27,19 +24,21 @@ get_emojis(search_str) {
         ; look for hotstring pattern
         If (SubStr(line, 1, 1) == ":") {
             parts := StrSplit(line, ":`:")
-            name := SubStr(parts[1], 5)
+            name := SubStr(parts[1], 6)
 
             ; add if search string is a substring
             If (InStr(name, search_str)){
                 emoji := parts[2]
-                emojis .= name "`t" emoji "`n"
+                ; add to beginning of string
+                emojis := name ": " emoji "`n" . emojis
             }
         } Else {
             Break
         }
     }
 
-    Return % emojis
+    ; remove last newline
+    Return % SubStr(emojis, 1, StrLen(emojis) - 1)
 }
 
 row(name, arr, offset, x_pos, y_pos, max=10) {
@@ -59,12 +58,11 @@ row(name, arr, offset, x_pos, y_pos, max=10) {
     Return arr.Length()
 }
 
-::$e::
+::$emoji_palette::
     Sleep 1
-    If (GUI_Open) {
-        WinActivate % "ahk_id " GUI_Handle
+    If WinExist("ahk_id " gui_id) {
+        WinActivate
     } Else {
-        GUI_Open := 1
         Gui Add, Tab, w550 h525 Theme, Search|Add|Options
         Gui Font, s, Arial
         Gui Show, Center, Emoji Palette
@@ -97,7 +95,7 @@ row(name, arr, offset, x_pos, y_pos, max=10) {
         Gui, Add, CheckBox, vSymmetricRandEmoji, Symmetrical Random Emojis
         Gui Add, Button, gReloadBtn w100 h50 x250 y250, Reload
 
-        GUI_Handle := WinExist("A")
+        gui_id := WinExist("A")
     }
 Return
 
@@ -117,16 +115,13 @@ AddBtn:
         Return
     }
 
-    ; escape all special characters
+    ; escape `;: characters
     emoji := EmojiBar
-    ; first add backtick to backticks
+    ; backticks need to be escaped first
     emoji := RegExReplace(emoji, "``", "``$0")
-    ; these only need a backtick
     emoji := RegExReplace(emoji, "[;:]", "``$0")
-    ; these ones need to also be enclosed in curly braces
-    emoji := RegExReplace(emoji, "[{}^+!#]", "``{$0}")
 
-    FileAppend, `n:OC:$%NameBar%:`:%emoji%, %A_ScriptFullPath%, UTF-8
+    FileAppend, `n:OCT:$%NameBar%:`:%emoji%, %A_ScriptFullPath%, UTF-8
     GuiControl, , NameBar
     GuiControl, , EmojiBar
 Return
@@ -198,120 +193,120 @@ Return
 ; when X is pressed
 GuiClose:
     Gui Destroy
-    GUI_Open := 0
 Return
 
 ; O: omit ending character
 ; C: case sensitive
-:OC:$innocent::ʘ‿ʘ
-:OC:$reddit_disapproval::ಠ_ಠ
-:OC:$table_flip::(╯°□°）╯︵ ┻━┻
-:OC:$put_table_back::┬─┬ ノ( ゜-゜ノ)
-:OC:$tidy_up::┬─┬⃰͡ (ᵔᵕᵔ͜ )
-:OC:$double_flip::┻━┻ ︵ヽ(``Д´)ﾉ︵ ┻━┻
-:OC:$fisticuffs::ლ(｀ー´ლ)
-:OC:$cute_bear::ʕ•ᴥ•ʔ
-:OC:$squinting_bear::ʕᵔᴥᵔʔ
-:OC:$GTFO_bear::ʕ •``ᴥ•´ʔ
-:OC:$cute_big_eyes::(｡◕‿◕｡)
-:OC:$surprised::（　ﾟДﾟ）
-:OC:$shrug::¯\_(ツ)_/¯
-:OC:$meh::¯\(°_o)/¯
-:OC:$perky::(``･ω･´)
-:OC:$angry::(╬ ಠ益ಠ)
-:OC:$at_what_cost::ლ(ಠ益ಠლ)
-:OC:$excited::☜(⌒▽⌒)☞
-:OC:$running::ε=ε=ε=┌(`;*´Д``)ﾉ
-:OC:$happy::ヽ(´▽``)/
-:OC:$basking_in_glory::ヽ(´ー｀)ノ
-:OC:$kitty::ᵒᴥᵒ{#}
-:OC:$fido::V•ᴥ•V
-:OC:$meow::ฅ{^}•ﻌ•{^}ฅ
-:OC:$cheers::（ {^}_{^}）o自自o（{^}_{^} ）
-:OC:$devious_smile::ಠ‿ಠ
-:OC:$4chan_emoticon::( ͡° ͜ʖ ͡°)
-:OC:$crying::ಥ_ಥ
-:OC:$happy_crying::ಥ‿ಥ
-:OC:$breakdown::ಥ﹏ಥ
-:OC:$disagree::٩◔̯◔۶
-:OC:$flexing::ᕙ(⇀‸↼‶)ᕗ
-:OC:$do_you_even_lift_bro::ᕦ(ò_óˇ)ᕤ
-:OC:$kirby::⊂(◉‿◉)つ
-:OC:$tripping_out::q(❂‿❂)p
-:OC:$discombobulated::⊙﹏⊙
-:OC:$sad_confused::¯\_(⊙︿⊙)_/¯
-:OC:$japanese_lion_face::°‿‿°
-:OC:$confused::¿ⓧ_ⓧﮌ
-:OC:$confused_scratch::(⊙.☉)7
-:OC:$worried::(´･_･``)
-:OC:$dear_god_why::щ（ﾟДﾟщ）
-:OC:$staring::٩(๏_๏)۶
-:OC:$pretty_eyes::ఠ_ఠ
-:OC:$strut::ᕕ( ᐛ )ᕗ
-:OC:$zoned::(⊙_◎)
-:OC:$crazy::ミ●﹏☉ミ
-:OC:$trolling::༼∵༽ ༼⍨༽ ༼⍢༽ ༼⍤༽
-:OC:$angry_troll::ヽ༼ ಠ益ಠ ༽ﾉ
-:OC:$fuck_it::t(-_-t)
-:OC:$sad_face::(ಥ⌣ಥ)
-:OC:$hugger::(づ￣ ³￣)づ
-:OC:$stranger_danger::(づ｡◕‿‿◕｡)づ
-:OC:$flip_friend::(ノಠ ∩ಠ)ノ彡( \o°o)\
-:OC:$cry_face::｡ﾟ( ﾟஇ‸இﾟ)ﾟ｡
-:OC:$cry_troll::༼ ༎ຶ ෴ ༎ຶ༽
-:OC:$TGIF::“ヽ(´▽｀)ノ”
-:OC:$dancing::┌(ㆆ㉨ㆆ)ʃ
-:OC:$sleepy::눈_눈
-:OC:$angry_birds::( ఠൠఠ )ﾉ
-:OC:$no_support::乁( ◔ ౪◔)「 ┑(￣Д ￣)┍
-:OC:$shy::(๑•́ ₃ •̀๑)
-:OC:$fly_away::⁽⁽ଘ( ˊᵕˋ )ଓ⁾⁾
-:OC:$careless::◔_◔
-:OC:$love::♥‿♥
-:OC:$touchy_feely::ԅ(≖‿≖ԅ)
-:OC:$kissing::( ˘ ³˘)♥
-:OC:$shark_face::( ˇ෴ˇ )
-:OC:$emo_dance::ヾ(-_- )ゞ
-:OC:$dance::♪♪ ヽ(ˇ∀ˇ )ゞ
-:OC:$opera::ヾ(´〇``)ﾉ♪♪♪
-:OC:$winnie_the_pooh::ʕ •́؈•̀)
-:OC:$boxing::ლ(•́•́ლ)
-:OC:$fight::(ง'̀-'́)ง
-:OC:$headphones::◖ᵔᴥᵔ◗ ♪ ♫
-:OC:$robot::`{{}•̃_•̃`{}}
-:OC:$seal::(ᵔᴥᵔ)
-:OC:$questionable::(Ծ‸ Ծ)
-:OC:$winning::(•̀ᴗ•́)و ̑̑
-:OC:$zombie::[¬º-°]¬
-:OC:$pointing::(☞ﾟヮﾟ)☞
-:OC:$chasing::''⌐(ಠ۾ಠ)¬'''
-:OC:$whistling::(っ•́｡•́)♪♬
-:OC:$injured::(҂◡_◡)
-:OC:$creeper::ƪ(ړײ)ƪ​​
-:OC:$eye_roll::⥀.⥀
-:OC:$flying::ح˚௰˚づ
-:OC:$can't_be_unseen::♨_♨
-:OC:$looking down::(._.)
-:OC:$im_a_hugger::(⊃｡•́‿•̀｡)⊃
-:OC:$wizard::(∩｀-´)⊃━☆ﾟ.*･｡ﾟ
-:OC:$yum::(っ˘ڡ˘ς)
-:OC:$judging::( ఠ ͟ʖ ఠ)
-:OC:$tired::( ͡ಠ ʖ̯ ͡ಠ)
-:OC:$dislike::( ಠ ʖ̯ ಠ)
-:OC:$hitchhiking::(งツ)ว
-:OC:$satisfied::(◠﹏◠)
-:OC:$sad_crying::(ᵟຶ︵ ᵟຶ)
-:OC:$stunna_shades::(っ▀¯▀)つ
-:OC:$chicken::ʚ(•｀
-:OC:$barf::(´ж｀ς)
-:OC:$fuck_off::(° ͜ʖ͡°)╭∩╮
-:OC:$smiley_toast::ʕʘ̅͜ʘ̅ʔ
-:OC:$exorcism::ح(•̀ж•́)ง †
-:OC:$love::-``ღ´-
-:OC:$straining::(⩾﹏⩽)
-:OC:$dab::ヽ( •_)ᕗ
-:OC:$wave_dance::~({^}-{^})~
-:OC:$happy_hug::\(ᵔᵕᵔ)/
-:OC:$eye_rest::ᴖ̮ ̮ᴖ
-:OC:$peepers::ಠಠ
-:OC:$judgemental::`{{}ಠʖಠ`{}}
+; T: escape {}^+!# characters
+:OCT:$innocent::ʘ‿ʘ
+:OCT:$reddit_disapproval::ಠ_ಠ
+:OCT:$table_flip::(╯°□°）╯︵ ┻━┻
+:OCT:$put_table_back::┬─┬ ノ( ゜-゜ノ)
+:OCT:$tidy_up::┬─┬⃰͡ (ᵔᵕᵔ͜ )
+:OCT:$double_flip::┻━┻ ︵ヽ(``Д´)ﾉ︵ ┻━┻
+:OCT:$fisticuffs::ლ(｀ー´ლ)
+:OCT:$cute_bear::ʕ•ᴥ•ʔ
+:OCT:$squinting_bear::ʕᵔᴥᵔʔ
+:OCT:$GTFO_bear::ʕ •``ᴥ•´ʔ
+:OCT:$cute_big_eyes::(｡◕‿◕｡)
+:OCT:$surprised::（　ﾟДﾟ）
+:OCT:$shrug::¯\_(ツ)_/¯
+:OCT:$meh::¯\(°_o)/¯
+:OCT:$perky::(``･ω･´)
+:OCT:$angry::(╬ ಠ益ಠ)
+:OCT:$at_what_cost::ლ(ಠ益ಠლ)
+:OCT:$excited::☜(⌒▽⌒)☞
+:OCT:$running::ε=ε=ε=┌(`;*´Д``)ﾉ
+:OCT:$happy::ヽ(´▽``)/
+:OCT:$basking_in_glory::ヽ(´ー｀)ノ
+:OCT:$kitty::ᵒᴥᵒ#
+:OCT:$fido::V•ᴥ•V
+:OCT:$meow::ฅ^•ﻌ•^ฅ
+:OCT:$cheers::（ ^_^）o自自o（^_^ ）
+:OCT:$devious_smile::ಠ‿ಠ
+:OCT:$4chan_emoticon::( ͡° ͜ʖ ͡°)
+:OCT:$crying::ಥ_ಥ
+:OCT:$happy_crying::ಥ‿ಥ
+:OCT:$breakdown::ಥ﹏ಥ
+:OCT:$disagree::٩◔̯◔۶
+:OCT:$flexing::ᕙ(⇀‸↼‶)ᕗ
+:OCT:$do_you_even_lift_bro::ᕦ(ò_óˇ)ᕤ
+:OCT:$kirby::⊂(◉‿◉)つ
+:OCT:$tripping_out::q(❂‿❂)p
+:OCT:$discombobulated::⊙﹏⊙
+:OCT:$sad_confused::¯\_(⊙︿⊙)_/¯
+:OCT:$japanese_lion_face::°‿‿°
+:OCT:$confused::¿ⓧ_ⓧﮌ
+:OCT:$confused_scratch::(⊙.☉)7
+:OCT:$worried::(´･_･``)
+:OCT:$dear_god_why::щ（ﾟДﾟщ）
+:OCT:$staring::٩(๏_๏)۶
+:OCT:$pretty_eyes::ఠ_ఠ
+:OCT:$strut::ᕕ( ᐛ )ᕗ
+:OCT:$zoned::(⊙_◎)
+:OCT:$crazy::ミ●﹏☉ミ
+:OCT:$trolling::༼∵༽ ༼⍨༽ ༼⍢༽ ༼⍤༽
+:OCT:$angry_troll::ヽ༼ ಠ益ಠ ༽ﾉ
+:OCT:$fuck_it::t(-_-t)
+:OCT:$sad_face::(ಥ⌣ಥ)
+:OCT:$hugger::(づ￣ ³￣)づ
+:OCT:$stranger_danger::(づ｡◕‿‿◕｡)づ
+:OCT:$flip_friend::(ノಠ ∩ಠ)ノ彡( \o°o)\
+:OCT:$cry_face::｡ﾟ( ﾟஇ‸இﾟ)ﾟ｡
+:OCT:$cry_troll::༼ ༎ຶ ෴ ༎ຶ༽
+:OCT:$TGIF::“ヽ(´▽｀)ノ”
+:OCT:$dancing::┌(ㆆ㉨ㆆ)ʃ
+:OCT:$sleepy::눈_눈
+:OCT:$angry_birds::( ఠൠఠ )ﾉ
+:OCT:$no_support::乁( ◔ ౪◔)「 ┑(￣Д ￣)┍
+:OCT:$shy::(๑•́ ₃ •̀๑)
+:OCT:$fly_away::⁽⁽ଘ( ˊᵕˋ )ଓ⁾⁾
+:OCT:$careless::◔_◔
+:OCT:$love::♥‿♥
+:OCT:$touchy_feely::ԅ(≖‿≖ԅ)
+:OCT:$kissing::( ˘ ³˘)♥
+:OCT:$shark_face::( ˇ෴ˇ )
+:OCT:$emo_dance::ヾ(-_- )ゞ
+:OCT:$dance::♪♪ ヽ(ˇ∀ˇ )ゞ
+:OCT:$opera::ヾ(´〇``)ﾉ♪♪♪
+:OCT:$winnie_the_pooh::ʕ •́؈•̀)
+:OCT:$boxing::ლ(•́•́ლ)
+:OCT:$fight::(ง'̀-'́)ง
+:OCT:$headphones::◖ᵔᴥᵔ◗ ♪ ♫
+:OCT:$seal::(ᵔᴥᵔ)
+:OCT:$questionable::(Ծ‸ Ծ)
+:OCT:$winning::(•̀ᴗ•́)و ̑̑
+:OCT:$zombie::[¬º-°]¬
+:OCT:$pointing::(☞ﾟヮﾟ)☞
+:OCT:$chasing::''⌐(ಠ۾ಠ)¬'''
+:OCT:$whistling::(っ•́｡•́)♪♬
+:OCT:$injured::(҂◡_◡)
+:OCT:$creeper::ƪ(ړײ)ƪ​​
+:OCT:$eye_roll::⥀.⥀
+:OCT:$flying::ح˚௰˚づ
+:OCT:$can't_be_unseen::♨_♨
+:OCT:$looking_down::(._.)
+:OCT:$im_a_hugger::(⊃｡•́‿•̀｡)⊃
+:OCT:$wizard::(∩｀-´)⊃━☆ﾟ.*･｡ﾟ
+:OCT:$yum::(っ˘ڡ˘ς)
+:OCT:$judging::( ఠ ͟ʖ ఠ)
+:OCT:$tired::( ͡ಠ ʖ̯ ͡ಠ)
+:OCT:$dislike::( ಠ ʖ̯ ಠ)
+:OCT:$hitchhiking::(งツ)ว
+:OCT:$satisfied::(◠﹏◠)
+:OCT:$sad_crying::(ᵟຶ︵ ᵟຶ)
+:OCT:$stunna_shades::(っ▀¯▀)つ
+:OCT:$chicken::ʚ(•｀
+:OCT:$barf::(´ж｀ς)
+:OCT:$fuck_off::(° ͜ʖ͡°)╭∩╮
+:OCT:$smiley_toast::ʕʘ̅͜ʘ̅ʔ
+:OCT:$exorcism::ح(•̀ж•́)ง †
+:OCT:$love::-``ღ´-
+:OCT:$straining::(⩾﹏⩽)
+:OCT:$dab::ヽ( •_)ᕗ
+:OCT:$wave_dance::~(^-^)~
+:OCT:$happy_hug::\(ᵔᵕᵔ)/
+:OCT:$eye_rest::ᴖ̮ ̮ᴖ
+:OCT:$peepers::ಠಠ
+:OCT:$judgemental::{ಠʖಠ}
+:OCT:$robot::{•̃_•̃}
